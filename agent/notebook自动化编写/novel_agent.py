@@ -340,6 +340,46 @@ class NovelWritingAgent:
 
         return "\n\n".join(context_parts)
 
+    def _get_previous_chapter_ending(self, chapter_num: int) -> str:
+        if chapter_num <= 1:
+            return ""
+
+        prev_chapter = None
+        for ch in self.chapters:
+            if ch["number"] == chapter_num - 1:
+                prev_chapter = ch
+                break
+
+        if not prev_chapter:
+            return ""
+
+        content = prev_chapter["content"]
+        last_500_chars = content[-500:] if len(content) > 500 else content
+
+        return f"""【第{prev_chapter['number']}章结尾内容，必须自然衔接】
+{last_500_chars}
+请新章节从上述结尾自然过渡，保持场景、动作、情绪的连贯性。陆桢的最后动作是："""
+
+    def _extract_last_action(self, chapter_num: int) -> str:
+        prev_chapter = None
+        for ch in self.chapters:
+            if ch["number"] == chapter_num - 1:
+                prev_chapter = ch
+                break
+
+        if not prev_chapter:
+            return ""
+
+        content = prev_chapter["content"]
+        last_text = content[-300:] if len(content) > 300 else content
+        lines = last_text.split("\n")
+        for i in range(len(lines) - 1, -1, -1):
+            line = lines[i].strip()
+            if line and len(line) > 10:
+                return f"（上章结尾：{line}）"
+
+        return ""
+
     def create_volumes(self, num_volumes: int = 10) -> List[Dict]:
         if not self.reference_style:
             self.set_reference_style("凡人修仙传")
@@ -663,6 +703,9 @@ class NovelWritingAgent:
 本章大纲要求：{outline_summary}
 请严格按照大纲剧情走向写作，不要偏离大纲的主线发展。"""
 
+            prev_ending = self._get_previous_chapter_ending(chapter_num)
+            last_action = self._extract_last_action(chapter_num)
+
             prompt = f"""{self._get_system_prompt()}
 
 === 第{chapter_num}章创作任务 ===
@@ -673,6 +716,16 @@ class NovelWritingAgent:
 
 === 前文回顾 ===
 {context}
+
+{prev_ending}
+{last_action}
+
+=== 章节衔接要求 ===
+【重要】新章节必须从前一章结尾自然过渡！保持：
+1. 场景连贯：如果上一章结尾在洗衣房，新章节开头不能直接跳到挑粪
+2. 动作连贯：主角的下一个动作必须承接上一章结尾的动作
+3. 时间连贯：注意时间推进的合理性（不能上章白天，下章突然晚上，除非有明确时间跳跃）
+4. 情绪连贯：主角的情绪状态要延续
 
 === 人物参考 ===
 {characters_hint or ""}

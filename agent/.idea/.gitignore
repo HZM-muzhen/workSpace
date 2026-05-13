@@ -3,3 +3,11 @@
 /workspace.xml
 # 基于编辑器的 HTTP 客户端请求
 /httpRequests/
+
+# 敏感配置
+*.xml
+*.iml
+!modules.xml
+!inspectionProfiles/
+!vcs.xml
+!misc.xml

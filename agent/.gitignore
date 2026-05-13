@@ -8,3 +8,33 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Environment variables (contains API keys and secrets)
+.env
+
+# Generated novel content
+novels/
+notebook自动化编写/novels/
+
+# Temporary generation scripts
+notebook自动化编写/generate_*.py
+notebook自动化编写/run_*.py
+notebook自动化编写/debug_*.py
+notebook自动化编写/test_*.py
+notebook自动化编写/check_*.py
+notebook自动化编写/batch_*.py
+notebook自动化编写/gen_*.py
+notebook自动化编写/continue_*.py
+notebook自动化编写/rewrite_*.py
+
+# Jupyter notebook checkpoints
+.ipynb_checkpoints/
+
+# IDE configuration
+.idea/
+*.iml
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
